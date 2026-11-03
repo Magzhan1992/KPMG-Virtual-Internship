@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sprocket Central | Customer & RFM Analytics</title>
+<style>
+:root{--navy:#1F2A44;--orange:#E96A2C;--green:#79C943;--bg:#F3F5F8;--card:#fff;--muted:#718096;--line:#E5EAF0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif;color:#182235}
+header{background:var(--navy);color:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:750;letter-spacing:.2px}.subtitle{font-size:12px;color:#c8d0df;margin-top:5px}
+.header-right{font-size:12px;color:#d9dfeb;text-align:right}
+.shell{max-width:1440px;margin:auto;padding:18px 22px 34px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:1px solid #dce2eb;background:#fff;color:var(--navy);padding:10px 13px;border-radius:9px;cursor:pointer;font-weight:650;font-size:12px}
+.tab.active{background:var(--orange);border-color:var(--orange);color:#fff}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:8px 0 15px}
+h1{font-size:22px;margin:0;color:var(--navy)}.desc{font-size:12px;color:var(--muted);margin-top:5px}
+select{padding:9px 12px;border:1px solid #d9e0ea;border-radius:8px;background:white;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:0 2px 7px #14213d08;min-height:93px}
+.kpi .label{font-size:11px;color:var(--muted);font-weight:600}.kpi .value{font-size:23px;font-weight:760;color:var(--navy);margin-top:8px;letter-spacing:-.4px}.kpi .note{font-size:10px;color:var(--muted);margin-top:4px}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:13px;margin-bottom:13px}
+.cols.equal{grid-template-columns:1fr 1fr}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;box-shadow:0 2px 7px #14213d08}
+.panel h3{margin:0 0 4px;color:var(--navy);font-size:14px}.panel .hint{color:var(--muted);font-size:10px;margin-bottom:13px}
+.chart{width:100%;min-height:230px}.barrow{display:grid;grid-template-columns:minmax(85px,1fr) 2.1fr 72px;gap:9px;align-items:center;margin:12px 0;font-size:11px}
+.bartrack{height:12px;background:#edf1f6;border-radius:20px;overflow:hidden}.barfill{height:100%;background:var(--orange);border-radius:20px}
+.barfill.navy{background:var(--navy)}.barfill.green{background:var(--green)}
+.barvalue{text-align:right;font-variant-numeric:tabular-nums;color:#42516a}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-top:9px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;color:#627087;background:#f4f6f9;padding:9px}td{padding:9px;border-bottom:1px solid #edf0f4}tr:last-child td{border-bottom:0}
+.pill{display:inline-block;border-radius:20px;background:#fff0e8;color:#b84a16;padding:4px 8px;font-size:10px;font-weight:700}
+.note-box{background:#fff7ed;border-left:4px solid var(--orange);padding:12px 14px;border-radius:7px;color:#74421c;font-size:12px;line-height:1.5;margin:12px 0}
+.good-box{background:#eff8e9;border-left:4px solid var(--green);padding:12px 14px;border-radius:7px;color:#31551c;font-size:12px;line-height:1.5;margin:12px 0}
+.footer{font-size:10px;color:#8490a2;margin-top:18px;text-align:right}
+.hidden{display:none}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.shell{padding:12px}.grid{grid-template-columns:repeat(2,1fr)}.cols,.cols.equal{grid-template-columns:1fr}h1{font-size:19px}}
+</style></head>
+<body>
+<header><div><div class="brand">SPROCKET CENTRAL PTY LTD</div><div class="subtitle">CUSTOMER & RFM ANALYTICS DASHBOARD</div></div><div class="header-right">ИСТОРИЧЕСКИЙ АНАЛИЗ · 2017<br>RFM snapshot: 30.12.2017</div></header>
+<div class="shell">
+<div class="tabs" id="tabs"></div>
+<div class="toolbar"><div><h1 id="pageTitle"></h1><div class="desc" id="pageDesc"></div></div><div><label for="stateFilter" style="font-size:11px;color:#68768c;margin-right:7px">Регион</label><select id="stateFilter"><option value="All">Все регионы</option><option>NSW</option><option>VIC</option><option>QLD</option><option>Unknown</option></select></div></div>
+<div id="content"></div>
+<div class="footer">Подготовлено по загруженному Power BI Implementation Pack · денежная единица в источнике не указана</div>
+</div>
+<script>
+const D={"metrics": {"customers": 4000, "rfm_customers": 3493, "without_rfm": 507, "approved_transactions": 19821, "cancelled_transactions": 179, "revenue": 21954196.69, "cost": 10907991.255028099, "profit": 10831504.0349719, "margin": 0.49336826976254533, "aov": 1107.6230608950104, "champions": 578, "champions_profit": 2801992.29, "avg_recency": 61.23046092184369, "avg_frequency": 5.674491840824506, "avg_monetary": 6285.1980217578, "missing_product_attrs": 197, "missing_online_order": 360, "missing_cost": 197, "avg_age_valid": 39.97337429595494}, "segments": [{"RFM_segment": "At risk", "customers": 753, "profit": 1351155.0649719, "monetary": 2783057.26, "avg_monetary": 3695.959176626826}, {"RFM_segment": "Champions / most loyal", "customers": 578, "profit": 2801992.29, "monetary": 5661135.4, "avg_monetary": 9794.351903114188}, {"RFM_segment": "Loyal / promising", "customers": 690, "profit": 2671952.11, "monetary": 5287306.51, "avg_monetary": 7662.763057971014}, {"RFM_segment": "Other", "customers": 1472, "profit": 4006404.57, "monetary": 8222697.5200000005, "avg_monetary": 5586.071684782609}], "states": [{"state_clean": "NSW", "customers": 2138, "avg_age": 40.021103117505994, "revenue": 11663076.89, "profit": 5736612.99, "transactions": 10587}, {"state_clean": "QLD", "customers": 837, "avg_age": 39.33943833943834, "revenue": 4725131.98, "profit": 2322700.66, "transactions": 4228}, {"state_clean": "Unknown", "customers": 4, "avg_age": 42.25, "revenue": 34968.42, "profit": 15653.6749719, "transactions": 31}, {"state_clean": "VIC", "customers": 1021, "avg_age": 40.38476953907816, "revenue": 5531019.4, "profit": 2756536.71, "transactions": 4975}], "age": [{"age_group": "18–29", "customers": 831}, {"age_group": "30–39", "customers": 938}, {"age_group": "40–49", "customers": 1090}, {"age_group": "50–59", "customers": 694}, {"age_group": "60+", "customers": 278}, {"age_group": "Under 18", "customers": 82}, {"age_group": "Unknown", "customers": 87}], "gender": [{"gender_clean": "Female", "customers": 2039}, {"gender_clean": "Male", "customers": 1873}, {"gender_clean": "Unknown", "customers": 88}], "monthly": [{"month": "2017-01", "revenue": 1846812.04, "profit": 918820.3899878, "transactions": 1668}, {"month": "2017-02", "revenue": 1793659.92, "profit": 869942.57, "transactions": 1618}, {"month": "2017-03", "revenue": 1804421.68, "profit": 874394.8099999999, "transactions": 1644}, {"month": "2017-04", "revenue": 1821162.56, "profit": 895174.46, "transactions": 1638}, {"month": "2017-05", "revenue": 1891692.07, "profit": 904889.65, "transactions": 1667}, {"month": "2017-06", "revenue": 1736333.54, "profit": 849411.96, "transactions": 1562}, {"month": "2017-07", "revenue": 1879357.66, "profit": 932158.15, "transactions": 1703}, {"month": "2017-08", "revenue": 1918418.19, "profit": 963138.15, "transactions": 1733}, {"month": "2017-09", "revenue": 1728605.72, "profit": 854069.19, "transactions": 1558}, {"month": "2017-10", "revenue": 1943183.27, "profit": 975157.4749841, "transactions": 1756}, {"month": "2017-11", "revenue": 1801565.62, "profit": 914497.41, "transactions": 1649}, {"month": "2017-12", "revenue": 1788984.42, "profit": 879849.82, "transactions": 1625}], "brands": [{"brand": "WeareA2B", "revenue": 4126372.83, "profit": 2729902.83}, {"brand": "Solex", "revenue": 4446888.35, "profit": 2388554.8449841}, {"brand": "Trek Bicycles", "revenue": 3512223.81, "profit": 1822846.19}, {"brand": "Giant Bicycles", "revenue": 4055613.05, "profit": 1560130.48}, {"brand": "OHM Cycles", "revenue": 2965459.8, "profit": 1471181.1699756}, {"brand": "Norco Bicycles", "revenue": 2632937.45, "profit": 858888.5200122}, {"brand": null, "revenue": 214701.4, "profit": 0.0}], "product_lines": [{"product_line": "Standard", "revenue": 15488718.86, "profit": 8063637.5900122}, {"product_line": "Road", "revenue": 4002503.36, "profit": 1388338.9349596999}, {"product_line": "Touring", "revenue": 1984354.25, "profit": 1339014.55}, {"product_line": "Mountain", "revenue": 263918.82, "profit": 40512.96}, {"product_line": null, "revenue": 214701.4, "profit": 0.0}], "status": {"Approved": 19821, "Cancelled": 179}, "qa": [["product_id не уникален", "77 из 101 product_id имеют несколько комбинаций цены/себестоимости; 63 — несколько брендов", "Не создавать продуктовый справочник только по product_id."], ["Пропущенные товарные поля", "197 транзакций с пропусками в атрибутах товара/себестоимости", "Не подставлять нулевую себестоимость."], ["Пропуски online_order", "360 строк", "Показывать Unknown; не трактовать как False."], ["Отменённые заказы", "179 транзакций", "Исключать из финансовых KPI."], ["Клиент 5034", "3 транзакции без соответствия в клиентском справочнике", "Проверить ключи и сохранить строки в QA."], ["Клиент 753", "deceased_indicator=Y и 8 одобренных транзакций", "Отдельный бизнес-контроль; не удалять автоматически."], ["DOB клиента 34", "Дата рождения 1843-12-21; расчётный возраст около 174 лет", "Исключить из возрастных средних до исправления."], ["Поле default", "Тестовые и технические строки, XSS/SQL-like значения", "Не использовать и не показывать в отчёте."], ["Период данных", "01.01.2017–30.12.2017; RFM snapshot 30.12.2017", "Явно обозначить исторический период."], ["NewCustomerList", "Нет исходной таблицы 1 000 лидов в данном Excel", "Страница 6 показывает только агрегаты из презентации; без drill-through."]], "leads": {"count": 1000, "top100": 100, "hnw_share": 0.93, "nsw_share": 0.59, "female_share": 0.55, "avg_age": 48.6}};
+const pages=[
+["01","Общий обзор","Сводная картина клиентской базы и финансовых результатов."],
+["02","Профиль клиентов","Демография, география, возраст и благосостояние клиентской базы."],
+["03","RFM-сегментация","Ценность клиентов, давность и частота покупок, денежный вклад сегментов."],
+["04","Лояльность","Размер и вклад наиболее лояльных клиентов."],
+["05","Продажи и товары","Выручка, прибыль, динамика транзакций и продуктовые категории."],
+["06","Новые лиды","Агрегированные результаты модели Customer Value Score из презентации стажировки."],
+["07","Качество данных","Ограничения источника, ошибки и приоритеты улучшения данных."]
+];
+let active=0, region="All";
+const fmt=(n,d=0)=>Number(n||0).toLocaleString("ru-RU",{maximumFractionDigits:d,minimumFractionDigits:d});
+const money=n=>fmt(n,0);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function kpi(label,value,note=""){return `<div class="kpi"><div class="label">${label}</div><div class="value">${value}</div><div class="note">${note}</div></div>`}
+function panel(title,hint,body){return `<section class="panel"><h3>${title}</h3><div class="hint">${hint||""}</div>${body}</section>`}
+function bars(rows,labelKey,valueKey,opts={}){let max=Math.max(1,...rows.map(x=>Number(x[valueKey]||0)));return `<div class="chart">${rows.map((r,i)=>`<div class="barrow"><div>${esc(r[labelKey])}</div><div class="bartrack"><div class="barfill ${opts.navy?'navy':''} ${opts.green?'green':''}" style="width:${Math.max(1,Number(r[valueKey]||0)/max*100)}%"></div></div><div class="barvalue">${fmt(r[valueKey],opts.decimals||0)}</div></div>`).join("")}</div>`}
+function lineChart(rows){let W=700,H=220,L=52,R=18,T=15,B=36;let vals=rows.map(x=>x.revenue),max=Math.max(...vals)*1.08;let pts=rows.map((x,i)=>[L+i*(W-L-R)/(rows.length-1),T+(H-T-B)*(1-x.revenue/max)]);let pts2=rows.map((x,i)=>[L+i*(W-L-R)/(rows.length-1),T+(H-T-B)*(1-x.profit/max)]);let path=a=>a.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#dfe5ed"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="#dfe5ed"/><path d="${path(pts)}" fill="none" stroke="#E96A2C" stroke-width="3"/><path d="${path(pts2)}" fill="none" stroke="#1F2A44" stroke-width="3"/>${rows.map((x,i)=>`<text x="${pts[i][0]}" y="${H-12}" font-size="10" fill="#718096" text-anchor="middle">${x.month.slice(5)}</text>`).join("")}<text x="8" y="16" font-size="10" fill="#718096">₽*</text></svg><div class="legend"><span><i class="dot" style="background:#E96A2C"></i>Выручка</span><span><i class="dot" style="background:#1F2A44"></i>Прибыль</span></div>`}
+function table(headers,rows){return `<div style="overflow:auto"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+function stateData(){return D.states.filter(x=>region==="All"||x.state_clean===region)}
+function render(){
+document.getElementById("pageTitle").textContent=pages[active][0]+" · "+pages[active][1];
+document.getElementById("pageDesc").textContent=pages[active][2];
+document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("active",i===active));
+const m=D.metrics, st=stateData();let c="";
+if(active===0){
+c=`<div class="grid">${kpi("Клиенты",fmt(m.customers),"Полная клиентская база")}${kpi("Клиенты с RFM",fmt(m.rfm_customers),"87,3% клиентской базы")}${kpi("Одобренные транзакции",fmt(m.approved_transactions),"Только Approved")}${kpi("Выручка",money(m.revenue),"В единицах источника")}${kpi("Прибыль",money(m.profit),"После себестоимости")}${kpi("Рентабельность",fmt(m.margin*100,1)+"%","Прибыль / выручка")}</div>
+<div class="cols">${panel("Динамика выручки и прибыли","По месяцам 2017 года",lineChart(D.monthly))}${panel("Клиенты по RFM-сегментам","Количество клиентов",bars(D.segments,"RFM_segment","customers"))}</div>
+<div class="cols equal">${panel("Финансовый результат по регионам","Approved транзакции",bars(st,"state_clean","profit",{navy:true}))}${panel("Ключевые сегменты","Количество / доля RFM-клиентов",table(["Сегмент","Клиенты","Доля"],D.segments.map(x=>[esc(x.RFM_segment),fmt(x.customers),fmt(x.customers/m.rfm_customers*100,1)+"%"])))}</div>`;
+}
+if(active===1){
+c=`<div class="grid">${kpi("Всего клиентов",fmt(m.customers),"Клиентский справочник")}${kpi("Средний возраст",fmt(m.avg_age_valid,1),"Без DOB-аномалии")}${kpi("Женщины",fmt(D.gender.find(x=>x.gender_clean==="Female")?.customers||0),"После нормализации")}${kpi("Мужчины",fmt(D.gender.find(x=>x.gender_clean==="Male")?.customers||0),"После нормализации")}${kpi("С RFM",fmt(m.rfm_customers),"Есть история покупок")}${kpi("Без RFM",fmt(m.without_rfm),"Нет RFM-профиля")}</div>
+<div class="cols equal">${panel("Клиенты по возрастным группам","Возрастные группы из подготовленного набора",bars(D.age,"age_group","customers"))}${panel("Клиенты по полу","Нормализованные категории",bars(D.gender,"gender_clean","customers",{navy:true}))}</div>
+${panel("Клиентская база по регионам","Клиенты, средний возраст и прибыль",table(["Регион","Клиенты","Выручка","Прибыль"],st.map(x=>[esc(x.state_clean),fmt(x.customers),money(x.revenue),money(x.profit)])))}
+<div class="note-box">Возраст 174 года у одного клиента является ошибкой DOB. Средний возраст на карточке рассчитан без значений вне диапазона 16–100 лет. Доли пола не показываются как персональные характеристики.</div>`;
+}
+if(active===2){
+c=`<div class="grid">${kpi("RFM-клиенты",fmt(m.rfm_customers),"Клиенты с одобренными покупками")}${kpi("Champions",fmt(m.champions),"Самый ценный сегмент")}${kpi("Средняя давность",fmt(m.avg_recency,1)+" дней","Меньше — покупка недавнее")}${kpi("Средняя частота",fmt(m.avg_frequency,2),"Транзакций на клиента")}${kpi("Средняя Monetary",money(m.avg_monetary),"На RFM-клиента")}${kpi("Прибыль Champions",money(m.champions_profit),"Вклад champion-сегмента")}</div>
+<div class="cols equal">${panel("Клиенты по RFM-сегментам","Распределение 3 493 клиентов",bars(D.segments,"RFM_segment","customers"))}${panel("Прибыль по RFM-сегментам","Суммарный вклад сегмента",bars(D.segments,"RFM_segment","profit",{navy:true}))}</div>
+${panel("Детализация сегментов","Показатели рассчитаны на основе RFM_Analysis",table(["Сегмент","Клиенты","Средняя Monetary","Суммарная прибыль"],D.segments.map(x=>[esc(x.RFM_segment),fmt(x.customers),money(x.avg_monetary),money(x.profit)])))}
+<div class="note-box">At risk — 753 клиента (21,6% RFM-базы). Это потенциальная аудитория для win-back коммуникаций, но не доказательство того, что клиенты уже ушли.</div>`;
+}
+if(active===3){
+c=`<div class="grid">${kpi("Champions",fmt(m.champions),"16,5% RFM-клиентов")}${kpi("Loyal Customers",fmt(m.champions),"По сегменту Champions")}${kpi("Доля Champions",fmt(m.champions/m.rfm_customers*100,1)+"%","От RFM-клиентов")}${kpi("Прибыль Champions",money(m.champions_profit),"В единицах источника")}</div>
+<div class="cols equal">${panel("Лояльность по возрастным группам","Число лояльных клиентов из Age_Summary",bars([{age_group:"18–29",v:127},{age_group:"30–39",v:128},{age_group:"40–49",v:151},{age_group:"50–59",v:100},{age_group:"60+",v:35},{age_group:"Under 18",v:13},{age_group:"Unknown",v:24}],"age_group","v"))}${panel("Вклад RFM-сегментов в прибыль","Суммарная прибыль",bars(D.segments,"RFM_segment","profit",{green:true}))}</div>
+<div class="note-box">В исходной методологии лояльность определяется условиями R_score ≥ 4, F_score ≥ 4 и M_score ≥ 4. Число 578 отражает сегмент Champions / most loyal; не следует считать его универсальным числом всех клиентов с любым признаком повторной покупки.</div>`;
+}
+if(active===4){
+c=`<div class="grid">${kpi("Одобренные транзакции",fmt(m.approved_transactions),"Продажи")}${kpi("Выручка",money(m.revenue),"Только Approved")}${kpi("Себестоимость",money(m.cost),"Только Approved")}${kpi("Прибыль",money(m.profit),"Только Approved")}${kpi("Маржа",fmt(m.margin*100,1)+"%","Прибыль / выручка")}${kpi("Средний чек",money(m.aov),"Выручка / Approved")}</div>
+<div class="cols">${panel("Динамика продаж","Выручка и прибыль по месяцам",lineChart(D.monthly))}${panel("Прибыль по брендам","Топ-10 брендов по сумме прибыли",bars(D.brands,"brand","profit"))}</div>
+<div class="cols equal">${panel("Выручка по продуктовым линейкам","Сумма list_price, Approved",bars(D.product_lines,"product_line","revenue",{navy:true}))}${panel("Статусы транзакций","Количество строк",bars(Object.entries(D.status).map(([k,v])=>({status:k,count:v})),"status","count"))}</div>
+<div class="note-box">179 отменённых заказов хранятся вместе с продажами. Финансовые показатели выше исключают Cancelled. 197 транзакций имеют пропуски товарных атрибутов и себестоимости, поэтому интерпретация прибыли требует осторожности.</div>`;
+}
+if(active===5){
+const l=D.leads;
+c=`<div class="grid">${kpi("Новые лиды",fmt(l.count),"Источник: презентация стажировки")}${kpi("Приоритетная группа",fmt(l.top100),"Top 10% по Value Score")}${kpi("High Net Worth",fmt(l.hnw_share*100,0)+"%","В Top 100")}${kpi("NSW",fmt(l.nsw_share*100,0)+"%","В Top 100")}${kpi("Женщины",fmt(l.female_share*100,0)+"%","В Top 100")}${kpi("Средний возраст",fmt(l.avg_age,1),"В Top 100")}</div>
+<div class="cols equal">${panel("Профиль приоритетных лидов","Показатели из презентации, не пересчитаны по строкам",bars([{name:"High Net Worth",v:l.hnw_share*100},{name:"NSW",v:l.nsw_share*100},{name:"Женщины",v:l.female_share*100}],"name","v"))}${panel("Модель Customer Value Score","Веса компонентов из методологии",table(["Компонент","Вес"],[["Wealth segment","30%"],["Bike-related purchases (3 yr)","30%"],["Property valuation","25%"],["Tenure","15%"]]))}</div>
+<div class="note-box"><b>Ограничение:</b> в загруженном Excel отсутствует исходный лист NewCustomerList с 1 000 строками. Поэтому здесь показаны только агрегаты из презентации. Индивидуальный рейтинг, распределение Value Score и drill-through по лидам нельзя построить без исходного файла.</div>`;
+}
+if(active===6){
+c=`<div class="grid">${kpi("Клиентские записи",fmt(m.customers),"В справочнике")}${kpi("RFM-клиенты",fmt(m.rfm_customers),"Есть RFM")}${kpi("Без RFM",fmt(m.without_rfm),"Нет истории покупок")}${kpi("Отменённые",fmt(m.cancelled_transactions),"Транзакции")}${kpi("Пропуски товара",fmt(m.missing_product_attrs),"Строки с пропусками")}${kpi("Пропуски online_order",fmt(m.missing_online_order),"Строки")}</div>
+${panel("Реестр проблем качества данных","Факты из QA_Notes и приложенного списка ошибок",table(["Проблема","Обнаружено","Рекомендация"],D.qa.map(x=>x.map(esc))))}
+<div class="good-box">Приоритеты: (1) исправить неоднозначность product_id; (2) валидировать customer_id и справочники; (3) устранить пропуски себестоимости; (4) нормализовать даты и категории; (5) исключить техническое поле default из аналитики.</div>`;
+}
+document.getElementById("content").innerHTML=c;
+}
+const tabs=document.getElementById("tabs");
+pages.forEach((p,i)=>{let b=document.createElement("button");b.className="tab";b.textContent=p[0]+" "+p[1];b.onclick=()=>{active=i;render()};tabs.appendChild(b)});
+document.getElementById("stateFilter").addEventListener("change",e=>{region=e.target.value;render()});
+render();
+</script></body></html>
